@@ -3,8 +3,8 @@ angular.module('segmentio', ['ng'])
         function($rootScope, $window, $location, $log) {
             var service = {};
 
-            //create a temp queue for events fired before analytics loaded
-            //but do not attempt to create 'analytics' object
+            //Create a temp queue for events fired before analytics loaded
+            //but do not attempt to create 'analytics' object.
             var tempQueue = [];
 
             // Define a factory that generates wrapper methods to push arrays of
@@ -14,8 +14,8 @@ angular.module('segmentio', ['ng'])
                 return function() {
                     var args = Array.prototype.slice.call(arguments, 0);
                     $log.debug('Call segmentio API with', type, args);
-                    //because we don't overwrite the analytics object we can use
-                    //its presence as a flag that segment.io has loaded
+                    //Because we didn't overwrite the analytics object we can use
+                    //its presence as a flag that segment.io has loaded.
                     if ($window.analytics) {
                         if (tempQueue.length) {
                             $window.analytics.push.apply($window.analytics, tempQueue)
