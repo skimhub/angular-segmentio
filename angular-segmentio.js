@@ -3,22 +3,22 @@ angular.module('segmentio', ['ng'])
         function($rootScope, $window, $location, $log) {
             var service = {};
 
-            //Create a temp queue for events fired before analytics loaded
-            //but do not attempt to create 'analytics' object.
+            // Create a temp queue for events fired before analytics loaded
+            // but do not attempt to create 'analytics' object.
             var tempQueue = [];
 
 
             function flushTempQueue () {
-                // Send the queue of pending events
-                $window.analytics.push.apply($window.analytics, tempQueue)
-                tempQueue.length = 0
+                if (tempQueue.length) {
+                    // Send the queue of pending events
+                    $window.analytics.push.apply($window.analytics, tempQueue)
+                    tempQueue.length = 0
+                }
             }
 
             //  Analytics script is loaded callback.
             var analyticsLoaded = function() {
-                if (tempQueue.length) {
-                    flushTempQueue()
-                }
+                flushTempQueue()
             }
 
             // Define a factory that generates wrapper methods to push arrays of
