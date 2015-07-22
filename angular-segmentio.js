@@ -7,6 +7,20 @@ angular.module('segmentio', ['ng'])
             //but do not attempt to create 'analytics' object.
             var tempQueue = [];
 
+
+            function flushTempQueue () {
+                // Send the queue of pending events
+                $window.analytics.push.apply($window.analytics, tempQueue)
+                tempQueue.length = 0
+            }
+
+            //  Analytics script is loaded callback.
+            var analyticsLoaded = function() {
+                if (tempQueue.length) {
+                    flushTempQueue()
+                }
+            }
+
             // Define a factory that generates wrapper methods to push arrays of
             // arguments onto our `analytics` queue, where the first element of the arrays
             // is always the name of the analytics.js method itself (eg. `track`).
@@ -14,13 +28,10 @@ angular.module('segmentio', ['ng'])
                 return function() {
                     var args = Array.prototype.slice.call(arguments, 0);
                     $log.debug('Call segmentio API with', type, args);
+
                     //Because we didn't overwrite the analytics object we can use
                     //its presence as a flag that segment.io has loaded.
                     if ($window.analytics) {
-                        if (tempQueue.length) {
-                            $window.analytics.push.apply($window.analytics, tempQueue)
-                            tempQueue.length = 0
-                        }
                         $log.debug('Segmentio API initialized, calling API');
                         $window.analytics[type].apply($window.analytics, args);
                     } else {
@@ -58,6 +69,7 @@ angular.module('segmentio', ['ng'])
                 script.async = true;
                 script.src = ('https:' === document.location.protocol ? 'https://' : 'http://') +
                     'd2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/' + apiKey + '/analytics.js';
+                script.onload = analyticsLoaded
 
                 // Find the first script element on the page and insert our script next to it.
                 var firstScript = document.getElementsByTagName('script')[0];
